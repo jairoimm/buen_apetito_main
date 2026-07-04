@@ -47,3 +47,15 @@ export const getClientes = (negocioId) =>
  
 export const crearCliente = (negocioId, data) =>
   client.post(`/negocios/${negocioId}/clientes/`, data).then(r => r.data);
+
+export const getMiPerfil = (negocioId) =>
+  client.get(`/negocios/${negocioId}/mi-perfil/`).then(r => r.data);
+
+export const getUsuariosNegocio = (negocioId) =>
+  client.get(`/negocios/${negocioId}/usuarios/`).then(r => r.data);
+
+export const invitarUsuarioNegocio = (negocioId, payload) =>
+  client.post(`/negocios/${negocioId}/usuarios/`, payload).then(r => r.data);
+
+export const actualizarUsuarioNegocio = (negocioId, pk, payload) =>
+  client.patch(`/negocios/${negocioId}/usuarios/${pk}/`, payload).then(r => r.data);

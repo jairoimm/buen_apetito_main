@@ -8,7 +8,8 @@ import Ventas from './pages/Ventas';
 import Inventario from './pages/Inventario';
 import Clientes from './pages/Clientes';
 import Reportes from './pages/Reportes';
-import { getNegocios } from './api/services';
+import Staff from './pages/Staff';
+import { getNegocios, getMiPerfil } from './api/services';
 import './App.css';
 
 const NegocioSelector = ({ onSelect }) => {
@@ -48,20 +49,45 @@ const NegocioSelector = ({ onSelect }) => {
 
 const AppLayout = () => {
   const [negocio, setNegocio] = useState(null);
+  const [perfil, setPerfil] = useState(null);
+
+  useEffect(() => {
+    if (negocio) {
+      getMiPerfil(negocio.id)
+        .then(setPerfil)
+        .catch(() => setPerfil(null));
+    }
+  }, [negocio]);
 
   if (!negocio) return <NegocioSelector onSelect={setNegocio} />;
+  if (!perfil) return <div className="loading fullscreen">Cargando tu perfil...</div>;
 
   return (
     <div className="app-layout">
-      <Sidebar negocio={negocio} />
+      <Sidebar negocio={negocio} permisos={perfil.permisos} />
       <main className="main-content">
         <Routes>
-          <Route path="/"           element={<Dashboard   negocioId={negocio.id} />} />
-          <Route path="/ventas"     element={<Ventas      negocioId={negocio.id} />} />
-          <Route path="/inventario" element={<Inventario  negocioId={negocio.id} />} />
-          <Route path="/clientes"   element={<Clientes    negocioId={negocio.id} />} />
-          <Route path="/reportes"   element={<Reportes    negocioId={negocio.id} />} />
-          <Route path="*"           element={<Navigate to="/" replace />} />
+          <Route path="/" element={<Dashboard negocioId={negocio.id} />} />
+          <Route path="/ventas" element={<Ventas negocioId={negocio.id} />} />
+          <Route path="/inventario" element={<Inventario negocioId={negocio.id} />} />
+          <Route path="/clientes" element={<Clientes negocioId={negocio.id} />} />
+          <Route
+            path="/reportes"
+            element={
+              perfil.permisos.ver_reportes
+                ? <Reportes negocioId={negocio.id} />
+                : <Navigate to="/" replace />
+            }
+          />
+          <Route
+            path="/staff"
+            element={
+              perfil.permisos.gestionar_usuarios
+                ? <Staff negocioId={negocio.id} />
+                : <Navigate to="/" replace />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </div>
