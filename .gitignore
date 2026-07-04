@@ -1,15 +1,23 @@
-# Entornos virtuales
+# Entornos virtuales (el que creamos anteriormente)
 venv/
 env/
+.env
 
-# Entorno de Node
-node_modules/
-package-lock.json
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Archivos de base de datos
+# Base de datos local (SQLite)
 db.sqlite3
 
-# Archivos de sistema y logs
-__pycache__/
-*.pyc
+# Archivos de configuración de VS Code
+.vscode/
+
+# Archivos de migraciones (opcional, pero recomendado ignorar solo los archivos compilados si es necesario)
+# Nota: Generalmente es bueno subir los archivos de migración (.py) a Git, 
+# pero ignora los archivos de caché si los hubiera.
+
+# Logs y archivos temporales
+*.log
 .DS_Store
