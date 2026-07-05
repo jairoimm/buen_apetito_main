@@ -1,0 +1,15 @@
+# Entornos virtuales
+venv/
+env/
+
+# Entorno de Node
+node_modules/
+package-lock.json
+
+# Archivos de base de datos
+db.sqlite3
+
+# Archivos de sistema y logs
+__pycache__/
+*.pyc
+.DS_Store
