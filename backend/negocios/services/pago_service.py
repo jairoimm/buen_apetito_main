@@ -1,10 +1,11 @@
+from django.db import transaction
 from django.core.exceptions import ValidationError
 from transbank.webpay.webpay_plus.transaction import Transaction
 from transbank.common.integration_commerce_codes import IntegrationCommerceCodes
 from transbank.common.integration_api_keys import IntegrationApiKeys
 
 from negocios.models import Pago, Pedido
-from negocios.services.venta_service import crear_venta
+from negocios.services.pedido_service import confirmar_venta_pedido, liberar_reserva_pedido
 
 
 def _tx():
@@ -39,25 +40,33 @@ def iniciar_pago_webpay(pedido):
     return {'url': respuesta['url'], 'token': respuesta['token']}
 
 
+@transaction.atomic
 def confirmar_pago_webpay(token):
-    pago = Pago.objects.select_related('pedido').get(token_pasarela=token)
+    pago = Pago.objects.select_related('pedido').select_for_update().get(token_pasarela=token)
+
+    # Idempotencia: si Transbank o el navegador reintentan el retorno,
+    # no se vuelve a procesar un pago ya resuelto.
+    if pago.estado in (Pago.Estado.APROBADO, Pago.Estado.RECHAZADO, Pago.Estado.ANULADO):
+        return pago
+
     respuesta = _tx().commit(token)
     pago.respuesta_cruda = respuesta
 
     if respuesta.get('status') == 'AUTHORIZED':
         pago.estado = Pago.Estado.APROBADO
         pedido = pago.pedido
-        venta = crear_venta(
-            negocio=pedido.negocio,
-            cliente=pedido.cliente,
-            items=[{'producto': i.producto, 'cantidad': i.cantidad} for i in pedido.items.all()],
-            observaciones=f"Pedido {pedido.numero}",
-        )
+
+        venta = confirmar_venta_pedido(pedido)
+
         pedido.venta = venta
         pedido.estado = Pedido.Estado.PAGADO
         pedido.save()
     else:
         pago.estado = Pago.Estado.RECHAZADO
+        pedido = pago.pedido
+        liberar_reserva_pedido(pedido)
+        pedido.estado = Pedido.Estado.CANCELADO
+        pedido.save()
 
     pago.save()
     return pago

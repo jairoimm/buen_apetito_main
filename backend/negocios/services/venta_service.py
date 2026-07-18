@@ -4,7 +4,7 @@ from negocios.models import Venta, DetalleVenta, MovimientoInventario, Secuencia
 
 
 @transaction.atomic
-def crear_venta(negocio, cliente, items, observaciones=''):
+def crear_venta(negocio, cliente, items, observaciones='', gestionar_inventario=True):
     if not items:
         raise ValidationError("La venta no tiene productos.")
 
@@ -35,25 +35,26 @@ def crear_venta(negocio, cliente, items, observaciones=''):
         )
         total += detalle.subtotal
 
-        for receta in producto.recetas.select_related('insumo').all():
-            inventario = getattr(receta.insumo, 'inventario', None)
-            if not inventario:
-                raise ValidationError(
-                    f"No hay inventario registrado para '{receta.insumo.nombre}'."
+        if gestionar_inventario:
+            for receta in producto.recetas.select_related('insumo').all():
+                inventario = getattr(receta.insumo, 'inventario', None)
+                if not inventario:
+                    raise ValidationError(
+                        f"No hay inventario registrado para '{receta.insumo.nombre}'."
+                    )
+                cantidad_necesaria = receta.cantidad * cantidad
+                if inventario.stock_disponible < cantidad_necesaria:
+                    raise ValidationError(
+                        f"Stock insuficiente de '{receta.insumo.nombre}'. "
+                        f"Disponible: {inventario.stock_disponible}, "
+                        f"requerido: {cantidad_necesaria}."
+                    )
+                MovimientoInventario.objects.create(
+                    insumo=receta.insumo,
+                    tipo=MovimientoInventario.TipoMovimiento.VENTA,
+                    cantidad=-(receta.cantidad * cantidad),
+                    referencia=f"Venta {venta.numero}",
                 )
-            cantidad_necesaria = receta.cantidad * cantidad
-            if inventario.stock_disponible < cantidad_necesaria:
-                raise ValidationError(
-                    f"Stock insuficiente de '{receta.insumo.nombre}'. "
-                    f"Disponible: {inventario.stock_disponible}, "
-                    f"requerido: {cantidad_necesaria}."
-                )
-            MovimientoInventario.objects.create(
-                insumo=receta.insumo,
-                tipo=MovimientoInventario.TipoMovimiento.VENTA,
-                cantidad=-(receta.cantidad * cantidad),
-                referencia=f"Venta {venta.numero}",
-            )
 
     venta.total = total
     venta.save()
