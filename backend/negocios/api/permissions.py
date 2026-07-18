@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from negocios.models import Negocio, UsuarioNegocio
+from django.db.models import Q
 
 
 def get_membresia(user, negocio_id):
@@ -58,8 +59,12 @@ class PuedeGestionarInventario(TieneAccesoAlNegocio):
         if not super().has_permission(request, view):
             return False
         if request.method == 'GET':
-            return True  # ver inventario → cualquier rol con acceso
-        return request.membresia.puede_gestionar_inventario
+            return True
+        negocio_id = view.kwargs.get('negocio_id')
+        if Negocio.objects.filter(id=negocio_id, propietario=request.user).exists():
+            return True
+        m = get_membresia(request.user, negocio_id)
+        return m and m.puede_gestionar_inventario
         
 
 
@@ -94,9 +99,14 @@ class EsDueno(TieneAccesoAlNegocio):
 
 class PuedeGestionarCatalogo(TieneAccesoAlNegocio):
     message = 'Solo el dueño o administrador puede modificar el menú.'
+
     def has_permission(self, request, view):
         if not super().has_permission(request, view):
             return False
         if request.method == 'GET':
-            return True  # ver categorías/productos → cualquier rol con acceso
-        return request.membresia.puede_gestionar_inventario
+            return True
+        negocio_id = view.kwargs.get('negocio_id')
+        if Negocio.objects.filter(id=negocio_id, propietario=request.user).exists():
+            return True
+        m = get_membresia(request.user, negocio_id)
+        return m and m.puede_gestionar_inventario

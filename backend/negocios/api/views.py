@@ -1,4 +1,4 @@
-from django.db.models import Sum, Count, Avg
+from django.db.models import Sum, Count, Avg, Q
 from django.utils.dateparse import parse_date
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -36,9 +36,10 @@ class NegocioListCreateView(ListCreateAPIView):
     serializer_class = NegocioSerializer
 
     def get_queryset(self):
+        user = self.request.user
         return Negocio.objects.filter(
-            usuarios_negocio__usuario=self.request.user,
-            usuarios_negocio__activo=True,
+            Q(propietario=user) |
+            Q(usuarios_negocio__usuario=user, usuarios_negocio__activo=True),
             activo=True
         ).distinct()
 
