@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 
 class Negocio(models.Model):
@@ -291,6 +292,7 @@ class Pedido(models.Model):
     negocio = models.ForeignKey(Negocio, on_delete=models.CASCADE, related_name='pedidos')
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name='pedidos')
     numero = models.CharField(max_length=20, unique=True)
+    token_publico = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE_PAGO)
     total = models.DecimalField(max_digits=12, decimal_places=2)
     notas = models.TextField(null=True, blank=True)

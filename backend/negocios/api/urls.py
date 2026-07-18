@@ -64,10 +64,10 @@ urlpatterns = [
     # Público — app de pedidos para clientes
     path('negocios/<int:negocio_id>/menu/', MenuPublicoView.as_view(), name='menu-publico'),
     path('negocios/<int:negocio_id>/pedidos/', PedidoPublicoView.as_view(), name='pedido-crear'),
-    path('negocios/<int:negocio_id>/pedidos/<str:numero>/estado/', EstadoPedidoView.as_view(), name='pedido-estado'),
+    path('negocios/<int:negocio_id>/pedidos/<uuid:token_publico>/', EstadoPedidoView.as_view(), name='pedido-estado'),
     path('clientes/registro/', RegistroClienteView.as_view(), name='cliente-registro'),
 
     # Pagos
-    path('negocios/<int:negocio_id>/pedidos/<str:numero>/pagar/webpay/', IniciarPagoWebpayView.as_view(), name='pagar-webpay'),
+    path('negocios/<int:negocio_id>/pedidos/<uuid:token_publico>/pago/', IniciarPagoWebpayView.as_view(), name='pedido-pago'),
     path('pagos/webpay/retorno/', RetornoWebpayView.as_view(), name='webpay-retorno'),
 ]

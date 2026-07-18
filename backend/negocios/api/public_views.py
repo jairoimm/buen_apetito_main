@@ -118,7 +118,7 @@ class PedidoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pedido
-        fields = ['id', 'numero', 'estado', 'estado_display', 'total', 'notas', 'items', 'fecha_creacion']
+        fields = ['id', 'numero','token_publico', 'estado', 'estado_display', 'total', 'notas', 'items', 'fecha_creacion']
 
 
 class PedidoPublicoView(APIView):
@@ -175,8 +175,8 @@ class PedidoPublicoView(APIView):
 class EstadoPedidoView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request, negocio_id, numero):
-        pedido = get_object_or_404(Pedido, negocio_id=negocio_id, numero=numero)
+    def get(self, request, negocio_id, token_publico):
+        pedido = get_object_or_404(Pedido, negocio_id=negocio_id, token_publico=token_publico)
         return Response(PedidoSerializer(pedido).data)
 
 
@@ -185,8 +185,10 @@ class EstadoPedidoView(APIView):
 class IniciarPagoWebpayView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request, negocio_id, numero):
-        pedido = get_object_or_404(Pedido, negocio_id=negocio_id, numero=numero)
+    def post(self, request, negocio_id, token_publico):
+        pedido = get_object_or_404(Pedido, negocio_id=negocio_id, token_publico=token_publico)
+        if pedido.estado != pedido.estado.PENDIENTE_PAGO:
+            return Response({'error': 'El pedido ya no está pendiente de pago.'}, status=400)
         try:
             data = iniciar_pago_webpay(pedido)
         except ValidationError as e:
