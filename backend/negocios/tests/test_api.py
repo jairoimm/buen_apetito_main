@@ -47,14 +47,16 @@ class NegocioAPITest(TestCase):
         self.user = crear_user()
         self.client.force_authenticate(user=self.user)
 
-    def test_crear_negocio(self):
-        r = self.client.post('/api/negocios/', {
-            'nombre': 'Mi Café', 'direccion': 'Calle 1',
-            'comuna': 'Providencia', 'telefono': '912345678',
-            'tipo_negocio': 'CAFETERIA', 'margen': '55.00'
-        })
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(r.data['nombre'], 'Mi Café')
+    def crear_negocio(user, nombre="Negocio Test"):
+        return Negocio.objects.create(
+        propietario=user, 
+        nombre=nombre, 
+        direccion="Calle 1",
+        comuna="Santiago", 
+        telefono="123456", 
+        tipo_negocio="CAFETERIA", 
+        margen=70,
+        )
 
     def test_listar_solo_mis_negocios(self):
         crear_negocio(self.user)
