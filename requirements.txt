@@ -18,3 +18,4 @@ sqlparse==0.5.5
 transbank-sdk==6.1.0
 tzdata==2026.2
 urllib3==2.7.0
+gunicorn
