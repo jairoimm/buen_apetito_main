@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -157,3 +158,5 @@ TRANSBANK_API_KEY = ''
 
 # URL donde tu frontend de clientes corre (para saber a dónde devolver al cliente tras pagar)
 FRONTEND_CLIENTE_URL = 'http://localhost:3001'  # ajusta cuando montemos el frontend de pedidos
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
