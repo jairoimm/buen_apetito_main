@@ -3,7 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
-import { ShoppingBag, Users, Package, TrendingUp } from 'lucide-react';
+import { ShoppingBag, Package, TrendingUp } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import useFetch from '../hooks/useFetch';
 import { getReporteVentas, getVentas, getInventario } from '../api/services';

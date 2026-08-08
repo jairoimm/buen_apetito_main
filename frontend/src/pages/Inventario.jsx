@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import useFetch from '../hooks/useFetch';
-import { getInventario, getInsumos, registrarMovimiento } from '../api/services';
+import { getInventario, registrarMovimiento } from '../api/services';
 import { AlertTriangle, Plus } from 'lucide-react';
  
 // getInsumos not exported yet — add it
