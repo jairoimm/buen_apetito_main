@@ -1,22 +1,27 @@
+# Core Django & REST Framework
 asgiref==3.8.1
+Django==5.2.11
+djangorestframework==3.15.2
+djangorestframework_simplejwt==5.3.1
+django-cors-headers==4.4.0
+sqlparse==0.5.1
+tzdata==2024.1
+
+# Database & Production (PostgreSQL & WSGI)
+dj-database-url==2.2.0
+psycopg2-binary==2.9.9
+gunicorn==22.0.0
+whitenoise==6.7.0
+
+# Utilities & Security
 certifi==2024.7.4
 charset-normalizer==3.3.2
 coverage==7.6.1
-dj-database-url==2.2.0
-Django==5.2.11
-django-cors-headers==4.4.0
-djangorestframework==3.15.2
-djangorestframework_simplejwt==5.3.1
 idna==3.7
 marshmallow==3.26.1
 packaging==24.1
 pillow==10.4.0
-psycopg2-binary==2.9.9
 PyJWT==2.8.0
 requests==2.31.0
-sqlparse==0.5.1
-transbank-sdk==6.1.0
-tzdata==2024.1
 urllib3==2.2.2
-gunicorn==22.0.0
-whitenoise==6.7.0
+transbank-sdk==6.1.0
