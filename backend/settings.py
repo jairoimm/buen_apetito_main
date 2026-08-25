@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6w+n5d&z1b3g!*l-7p)5p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', '*').split(',')]
 
 
 # Application definition
@@ -150,8 +150,13 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    
 ]
+env_cors = os.environ.get('CORS_ALLOWED_ORIGINS', '')
+if env_cors:
+    for origin in env_cors.split(','):
+        trimmed = origin.strip()
+        if trimmed and trimmed not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(trimmed)
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^http://192\.168\.\d{1,3}\.\d{1,3}:3000$',
@@ -166,4 +171,11 @@ TRANSBANK_API_KEY = ''
 # URL donde tu frontend de clientes corre (para saber a dónde devolver al cliente tras pagar)
 FRONTEND_CLIENTE_URL = 'http://localhost:3001'  # ajusta cuando montemos el frontend de pedidos
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
