@@ -23,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6w+n5d&z1b3g!*l-7p)5poqvhm=m1yuha+x7&4v^mjvij_j2_n')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-6w+n5d&z1b3g!*l-7p)5poqvhm=m1yuha+x7&4v^mjvij_j2_n' if os.environ.get('DEBUG', 'False').lower() == 'true' else None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', '*').split(',')]
 
@@ -181,3 +181,11 @@ STORAGES = {
 }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
